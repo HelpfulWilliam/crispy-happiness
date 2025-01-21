@@ -38,7 +38,13 @@
 <body>
     <h1>Push Notification Tester with Authentication</h1>
     <p>Log in, obtain a bearer token, register your device, and test push notifications.</p>
+    
+    <h3>Firebase Token:</h3>
+    <div id="token">No token generated yet.</div>
 
+    <button id="generate-token">Generate FCM Token</button>
+
+    
     <h3>Step 1: Log In</h3>
     <form id="login-form">
         <div class="form-group">
@@ -109,6 +115,30 @@
     <p id="device-status"></p>
 
     <script>
+
+        // Firebase config and initialization
+        const firebaseConfig = {
+            apiKey: "your-api-key",
+            authDomain: "your-auth-domain",
+            projectId: "your-project-id",
+            storageBucket: "your-storage-bucket",
+            messagingSenderId: "your-messaging-sender-id",
+            appId: "your-app-id"
+        };
+        const app = firebase.initializeApp(firebaseConfig);
+        const messaging = firebase.messaging();
+
+        // Generate FCM token
+        document.getElementById('generate-token').addEventListener('click', async () => {
+            try {
+                const token = await messaging.getToken();
+                document.getElementById('token').innerText = token || 'Token generation failed.';
+            } catch (error) {
+                console.error('Error getting FCM token:', error);
+                document.getElementById('token').innerText = 'Error generating token.';
+            }
+        });
+        
         let bearerToken = null;
 
         // Log in and obtain session ID
