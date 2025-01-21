@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Push Notification Tester</title>
+    <title>Push Notification Tester with Auth</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-messaging.js"></script>
     <style>
@@ -11,7 +11,7 @@
             font-family: Arial, sans-serif;
             margin: 20px;
         }
-        #token {
+        #token, #bearer-token {
             word-break: break-all;
             background: #f4f4f4;
             padding: 10px;
@@ -30,20 +30,57 @@
             padding: 8px;
             box-sizing: border-box;
         }
+        button {
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
-    <h1>Push Notification Tester</h1>
-    <p>This page registers a device for push notifications and sends the device information to the backend.</p>
-    
-    <button id="request-permission">Request Permission</button>
-    <p id="status"></p>
-    
-    <h3>Your Firebase Token:</h3>
-    <div id="token">No token generated yet.</div>
+    <h1>Push Notification Tester with Authentication</h1>
+    <p>Log in, obtain a bearer token, register your device, and test push notifications.</p>
 
+    <h3>Step 1: Log In</h3>
+    <form id="login-form">
+        <div class="form-group">
+            <label for="mobilePhone">Mobile Phone:</label>
+            <input type="text" id="mobilePhone" placeholder="Enter your phone number" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password (e.g., ID number):</label>
+            <input type="password" id="password" placeholder="Enter your password" required>
+        </div>
+        <div class="form-group">
+            <label for="identityDocumentType">Identity Document Type:</label>
+            <input type="text" id="identityDocumentType" placeholder="Enter your document type" required>
+        </div>
+        <button type="submit">Log In</button>
+    </form>
+    <p id="login-status"></p>
+
+    <h3>Step 2: Verify OTP</h3>
+    <form id="otp-form">
+        <div class="form-group">
+            <label for="sessionID">Session ID:</label>
+            <input type="text" id="sessionID" placeholder="Enter your session ID" required>
+        </div>
+        <div class="form-group">
+            <label for="cognitoUserId">Cognito User ID:</label>
+            <input type="text" id="cognitoUserId" placeholder="Enter your Cognito User ID" required>
+        </div>
+        <div class="form-group">
+            <label for="mfaCode">OTP:</label>
+            <input type="text" id="mfaCode" placeholder="Enter your OTP" required>
+        </div>
+        <button type="submit">Verify OTP</button>
+    </form>
+    <p id="otp-status"></p>
+
+    <h3>Your Bearer Token:</h3>
+    <div id="bearer-token">No token obtained yet.</div>
+
+    <h3>Step 3: Register Device</h3>
+    <!-- Device registration form (same as before) -->
     <form id="device-registration-form">
-        <h3>Register Device</h3>
         <div class="form-group">
             <label for="make">Make:</label>
             <input type="text" id="make" placeholder="Device make (e.g., Chrome)" required>
@@ -69,47 +106,74 @@
         </div>
         <button type="submit">Register Device</button>
     </form>
+    <p id="device-status"></p>
 
     <script>
-        // Your Firebase configuration
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID",
-            measurementId: "YOUR_MEASUREMENT_ID"
-        };
+        let bearerToken = null;
 
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const messaging = firebase.messaging();
+        // Log in and obtain session ID
+        document.getElementById('login-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const mobilePhone = document.getElementById('mobilePhone').value;
+            const password = document.getElementById('password').value;
+            const identityDocumentType = document.getElementById('identityDocumentType').value;
 
-        let fcmToken = null;
-
-        // Request notification permission
-        document.getElementById('request-permission').addEventListener('click', async () => {
             try {
-                await Notification.requestPermission();
-                document.getElementById('status').innerText = 'Notification permission granted.';
-                
-                // Get the FCM token
-                fcmToken = await messaging.getToken();
-                document.getElementById('token').innerText = fcmToken;
-                console.log("FCM Token:", fcmToken);
+                const response = await fetch('https://api.staging.unuhealth.org/api/Cognito/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mobilePhone, password, identityDocumentType })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('login-status').innerText = 'Login successful. Please verify OTP.';
+                    document.getElementById('sessionID').value = data.sessionID;
+                    document.getElementById('cognitoUserId').value = data.cognitoUserId;
+                } else {
+                    document.getElementById('login-status').innerText = `Login failed: ${data.message}`;
+                }
             } catch (error) {
-                console.error('Permission denied or error occurred:', error);
-                document.getElementById('status').innerText = 'Permission denied or error occurred.';
+                console.error('Error during login:', error);
+                document.getElementById('login-status').innerText = 'An error occurred during login.';
             }
         });
 
-        // Handle device registration form submission
+        // Verify OTP and obtain bearer token
+        document.getElementById('otp-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const sessionID = document.getElementById('sessionID').value;
+            const cognitoUserId = document.getElementById('cognitoUserId').value;
+            const mfaCode = document.getElementById('mfaCode').value;
+            const mobilePhone = document.getElementById('mobilePhone').value;
+
+            try {
+                const response = await fetch('https://api.staging.unuhealth.org/api/Cognito/login-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sessionID, cognitoUserId, mfaCode, mobilePhone })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    bearerToken = data.idToken;
+                    document.getElementById('bearer-token').innerText = bearerToken;
+                    document.getElementById('otp-status').innerText = 'OTP verified successfully.';
+                } else {
+                    document.getElementById('otp-status').innerText = `OTP verification failed: ${data.message}`;
+                }
+            } catch (error) {
+                console.error('Error during OTP verification:', error);
+                document.getElementById('otp-status').innerText = 'An error occurred during OTP verification.';
+            }
+        });
+
+        // Register device (reusing the earlier code)
         document.getElementById('device-registration-form').addEventListener('submit', async (event) => {
             event.preventDefault();
 
-            if (!fcmToken) {
-                alert("You must obtain the Firebase token first!");
+            if (!bearerToken) {
+                alert("You must log in and verify OTP first!");
                 return;
             }
 
@@ -119,7 +183,7 @@
             const deviceType = parseInt(document.getElementById('deviceType').value, 10);
 
             const deviceRegistration = {
-                Token: fcmToken,
+                Token: 'FirebaseTokenHere',
                 Make: make,
                 Model: model,
                 IsPrimary: isPrimary,
@@ -127,26 +191,25 @@
             };
 
             try {
-                const response = await fetch("https://your-backend-url/devices", {
-                    method: "POST",
+                const response = await fetch('https://your-backend-url/devices', {
+                    method: 'POST',
                     headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${yourAuthToken}` // Replace with your actual auth token
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${bearerToken}`
                     },
                     body: JSON.stringify(deviceRegistration)
                 });
 
                 if (response.ok) {
-                    const responseData = await response.json();
-                    alert(`Device registered successfully! Device ID: ${responseData.id}`);
+                    const data = await response.json();
+                    document.getElementById('device-status').innerText = `Device registered successfully! Device ID: ${data.id}`;
                 } else {
                     const errorData = await response.json();
-                    console.error("Error registering device:", errorData);
-                    alert("Failed to register device. Check console for details.");
+                    document.getElementById('device-status').innerText = `Error: ${errorData.message}`;
                 }
             } catch (error) {
-                console.error("Error during device registration:", error);
-                alert("An error occurred while registering the device.");
+                console.error('Error registering device:', error);
+                document.getElementById('device-status').innerText = 'An error occurred during device registration.';
             }
         });
     </script>
