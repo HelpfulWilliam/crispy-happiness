@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Push Notification Tester with Auth</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-messaging.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -114,18 +112,27 @@
     </form>
     <p id="device-status"></p>
 
-    <script>
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
 
-        // Firebase config and initialization
-        const firebaseConfig = {
-            apiKey: "your-api-key",
-            authDomain: "your-auth-domain",
-            projectId: "your-project-id",
-            storageBucket: "your-storage-bucket",
-            messagingSenderId: "your-messaging-sender-id",
-            appId: "your-app-id"
-        };
-        const app = firebase.initializeApp(firebaseConfig);
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyBXIfEFmRH9eCUqUZEba14Lou79ZpWsKRI",
+    authDomain: "notifications-test-c2f35.firebaseapp.com",
+    projectId: "notifications-test-c2f35",
+    storageBucket: "notifications-test-c2f35.firebasestorage.app",
+    messagingSenderId: "656684992609",
+    appId: "1:656684992609:web:bf196050a552b7170ec220",
+    measurementId: "G-81JS422NJG"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
         const messaging = firebase.messaging();
 
         // Generate FCM token
