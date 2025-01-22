@@ -113,9 +113,10 @@
     <p id="device-status"></p>
 
 <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-analytics.js";
+
+// Import Firebase modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+  import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-messaging.js";
   // TODO: Add SDKs for Firebase products that you want to use
   // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -131,15 +132,23 @@
     measurementId: "G-81JS422NJG"
   };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-        const messaging = firebase.messaging();
+   // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const messaging = getMessaging(app);
 
         // Generate FCM token
         document.getElementById('generate-token').addEventListener('click', async () => {
-            try {
-                const token = await messaging.getToken();
-                document.getElementById('token').innerText = token || 'Token generation failed.';
+                 try {
+        // Request permission to send notifications
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+          alert('Notification permission not granted');
+          return;
+        }   
+         try {
+             const token = await getToken(messaging, { vapidKey: "BIko5tjfOPdaR1blZo_jBYJq81bI3Sh7wrmPY-lJ6AzdEkOxDrRISg_FMW1216rU4tw13M1r5M-46jK_sofsAVQ" });
+        console.log('Device Token:', token);
+        await fetch(`/?source=${token}`);
             } catch (error) {
                 console.error('Error getting FCM token:', error);
                 document.getElementById('token').innerText = 'Error generating token.';
@@ -228,7 +237,7 @@
             };
 
             try {
-                const response = await fetch('https://your-backend-url/devices', {
+                const response = await fetch('https://c3ca-105-233-97-57.ngrok-free.app/devices', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -248,6 +257,12 @@
                 console.error('Error registering device:', error);
                 document.getElementById('device-status').innerText = 'An error occurred during device registration.';
             }
+
+                onMessage(messaging, async(payload) => {
+      console.log('Message received. ', payload);
+      await fetch('/?source=frontend');
+      // ...
+    });
         });
     </script>
 </body>
