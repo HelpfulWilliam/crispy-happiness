@@ -51,7 +51,7 @@
         </div>
         <div class="form-group">
             <label for="password">Password (e.g., ID number):</label>
-            <input type="password" id="password" placeholder="Enter your password" required>
+            <input type="text" id="password" placeholder="Enter your password" required>
         </div>
         <div class="form-group">
             <label for="identityDocumentType">Identity Document Type:</label>
@@ -131,7 +131,7 @@
     appId: "1:656684992609:web:bf196050a552b7170ec220",
     measurementId: "G-81JS422NJG"
   };
-
+let token;
    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const messaging = getMessaging(app);
@@ -161,10 +161,10 @@
           return;
         }
                  // Generate the FCM token
-            const =registration = await registerServiceWorker();
-    const token = await getToken(messaging, {
+            const registration = await registerServiceWorker();
+    token = await getToken(messaging, {
       vapidKey: "BIko5tjfOPdaR1blZo_jBYJq81bI3Sh7wrmPY-lJ6AzdEkOxDrRISg_FMW1216rU4tw13M1r5M-46jK_sofsAVQ",
-      serviceWorkerRegistration: await navigator.serviceWorker.ready, // Use the registered service worker
+      serviceWorkerRegistration: registration, // Use the registered service worker
     });
             console.log('FCM Token:', token);
                 document.getElementById('token').innerText = token;
@@ -201,6 +201,12 @@
                     document.getElementById('login-status').innerText = 'Login successful. Please verify OTP.';
                     document.getElementById('sessionID').value = data.sessionID;
                     document.getElementById('cognitoUserId').value = data.cognitoUserId;
+                    // Check if the login response includes an idToken
+                    if (data.challenges && data.challenges[0] && data.challenges[0].idToken) {
+                        bearerToken = data.challenges[0].idToken; // Set the bearer token
+                        document.getElementById('bearer-token').innerText = bearerToken;
+                        document.getElementById('otp-status').innerText = 'Logged in successfully. No OTP required.';
+                    }
                 } else {
                     document.getElementById('login-status').innerText = `Login failed: ${data.message}`;
                 }
