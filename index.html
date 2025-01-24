@@ -135,7 +135,22 @@
    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const messaging = getMessaging(app);
-
+        // Register the service worker
+        const registerServiceWorker = async () => {
+            if ('serviceWorker' in navigator) {
+                try {
+                    const registration = await navigator.serviceWorker.register('/crispy-happiness/firebase-messaging-sw.js', {
+                        scope: '/crispy-happiness/'
+                    });
+                    console.log('Service Worker registered:', registration.scope);
+                    return registration;
+                } catch (error) {
+                    console.error('Service Worker registration failed:', error);
+                }
+            } else {
+                console.error('Service Workers are not supported in this browser.');
+            }
+        };
         // Generate FCM token
         document.getElementById('generate-token').addEventListener('click', async () => {
         try {
@@ -146,11 +161,18 @@
           return;
         }
                  // Generate the FCM token
+            const =registration = await registerServiceWorker();
     const token = await getToken(messaging, {
       vapidKey: "BIko5tjfOPdaR1blZo_jBYJq81bI3Sh7wrmPY-lJ6AzdEkOxDrRISg_FMW1216rU4tw13M1r5M-46jK_sofsAVQ",
       serviceWorkerRegistration: await navigator.serviceWorker.ready, // Use the registered service worker
     });
-        console.log('Device Token:', token);
+            console.log('FCM Token:', token);
+                document.getElementById('token').innerText = token;
+                      } catch (error) {
+                console.error('Error generating FCM token:', error);
+                document.getElementById('token').innerText = 'Error generating token.';
+            }
+        });
         // await fetch(`/?source=${token}`);
         //     } catch (error) {
         //         console.error('Error getting FCM token:', error);
@@ -261,24 +283,12 @@
                 document.getElementById('device-status').innerText = 'An error occurred during device registration.';
             }
 
-                onMessage(messaging, async(payload) => {
+    onMessage(messaging, async(payload) => {
       console.log('Message received. ', payload);
       await fetch('/?source=frontend');
       // ...
     });
         });
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker
-    .register('/crispy-happiness/firebase-messaging-sw.js', { scope: '/crispy-happiness/' })
-    .then((registration) => {
-      console.log('Service Worker registered successfully with scope:', registration.scope);
-    })
-    .catch((err) => {
-      console.error('Error registering Service Worker:', err);
-    });
-} else {
-  console.error('Service workers are not supported in this browser.');
-}
 
     </script>
 </body>
