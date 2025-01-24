@@ -271,6 +271,15 @@ navigator.serviceWorker
       // ...
     });
         });
+navigator.serviceWorker
+  .register('/crispy-happiness/firebase-messaging-sw.js', { scope: '/crispy-happiness/' })
+  .then((registration) => {
+    messaging.useServiceWorker(registration);
+    console.log('Service Worker registered successfully with scope:', registration.scope);
+  })
+  .catch((err) => {
+    console.error('Error registering Service Worker:', err);
+  });
     </script>
 </body>
 </html>
