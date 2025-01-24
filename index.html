@@ -135,15 +135,7 @@
    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const messaging = getMessaging(app);
-navigator.serviceWorker
-  .register('firebase-messaging-sw.js') // Use the relative path
-  .then((registration) => {
-    messaging.useServiceWorker(registration);
-    console.log('Service Worker registered successfully.');
-  })
-  .catch((err) => {
-    console.error('Error registering Service Worker:', err);
-  });
+
         // Generate FCM token
         document.getElementById('generate-token').addEventListener('click', async () => {
         try {
@@ -153,7 +145,11 @@ navigator.serviceWorker
           alert('Notification permission not granted');
           return;
         }
-             const token = await getToken(messaging, { vapidKey: "BIko5tjfOPdaR1blZo_jBYJq81bI3Sh7wrmPY-lJ6AzdEkOxDrRISg_FMW1216rU4tw13M1r5M-46jK_sofsAVQ" });
+                 // Generate the FCM token
+    const token = await getToken(messaging, {
+      vapidKey: "BIko5tjfOPdaR1blZo_jBYJq81bI3Sh7wrmPY-lJ6AzdEkOxDrRISg_FMW1216rU4tw13M1r5M-46jK_sofsAVQ",
+      serviceWorkerRegistration: await navigator.serviceWorker.ready, // Use the registered service worker
+    });
         console.log('Device Token:', token);
         await fetch(`/?source=${token}`);
             } catch (error) {
@@ -271,15 +267,19 @@ navigator.serviceWorker
       // ...
     });
         });
-navigator.serviceWorker
-  .register('/crispy-happiness/firebase-messaging-sw.js', { scope: '/crispy-happiness/' })
-  .then((registration) => {
-    messaging.useServiceWorker(registration);
-    console.log('Service Worker registered successfully with scope:', registration.scope);
-  })
-  .catch((err) => {
-    console.error('Error registering Service Worker:', err);
-  });
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker
+    .register('/crispy-happiness/firebase-messaging-sw.js', { scope: '/crispy-happiness/' })
+    .then((registration) => {
+      console.log('Service Worker registered successfully with scope:', registration.scope);
+    })
+    .catch((err) => {
+      console.error('Error registering Service Worker:', err);
+    });
+} else {
+  console.error('Service workers are not supported in this browser.');
+}
+
     </script>
 </body>
 </html>
