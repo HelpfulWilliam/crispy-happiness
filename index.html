@@ -151,12 +151,12 @@
       serviceWorkerRegistration: await navigator.serviceWorker.ready, // Use the registered service worker
     });
         console.log('Device Token:', token);
-        await fetch(`/?source=${token}`);
-            } catch (error) {
-                console.error('Error getting FCM token:', error);
-                document.getElementById('token').innerText = 'Error generating token.';
-            }
-        });
+        // await fetch(`/?source=${token}`);
+        //     } catch (error) {
+        //         console.error('Error getting FCM token:', error);
+        //         document.getElementById('token').innerText = 'Error generating token.';
+        //     }
+        // });
         
         let bearerToken = null;
 
@@ -232,7 +232,7 @@
             const deviceType = parseInt(document.getElementById('deviceType').value, 10);
 
             const deviceRegistration = {
-                Token: 'FirebaseTokenHere',
+                Token: token,
                 Make: make,
                 Model: model,
                 IsPrimary: isPrimary,
@@ -240,7 +240,7 @@
             };
 
             try {
-                const response = await fetch('https://c3ca-105-233-97-57.ngrok-free.app/devices', {
+                const response = await fetch('https://1269-102-132-247-164.ngrok-free.app/devices', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
