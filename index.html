@@ -312,7 +312,7 @@ document.getElementById('set-ngrok-url').addEventListener('click', () => {
             };
 
             try {
-                const response = await fetch('${baseUrl}/devices', {
+                const response = await fetch(`${baseUrl}/devices`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -356,7 +356,7 @@ document.getElementById('push-notification-form').addEventListener('submit', asy
     };
 
     try {
-        const response = await fetch('${baseUrl}/notification-test', {
+        const response = await fetch(`${baseUrl}/notification-test`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
