@@ -282,7 +282,7 @@ const firebaseConfig = {
             const data = await response.json();
 
             if (response.ok) {
-                bearerToken = data.challengeResult.idToken;
+                bearerToken = data.authenticationResult.idToken;
                 document.getElementById('bearer-token').innerText = bearerToken;
                 document.getElementById('otp-status').innerText = 'OTP verified successfully.';
             } else {
