@@ -129,8 +129,8 @@
 <h3>Step 4: Send Push Notification</h3>
 <form id="push-notification-form">
     <div class="form-group">
-        <label for="deviceId">Device ID:</label>
-        <input type="text" id="deviceId" placeholder="Enter the Device ID" required>
+        <label for="token">Firebase Token:</label>
+        <input type="text" id="notificationToken" readonly required>
     </div>
     <div class="form-group">
         <label for="notificationTitle">Notification Title:</label>
@@ -222,6 +222,7 @@ const firebaseConfig = {
             });
             console.log('FCM Token:', token);
             document.getElementById('token').innerText = token;
+            document.getElementById('notificationToken').value = token;
         } catch (error) {
             console.error('Error generating FCM token:', error);
             document.getElementById('token').innerText = 'Error generating token.';
@@ -370,7 +371,11 @@ const firebaseConfig = {
             return;
         }
 
-        const deviceId = document.getElementById('deviceId').value;
+        const notificationToken = document.getElementById('notificationToken').value;
+        if (!notificationToken) {
+            alert("Please generate a Firebase token first!");
+            return;
+        }
         const notificationTitle = document.getElementById('notificationTitle').value;
         const notificationBody = document.getElementById('notificationBody').value;
         let payload;
@@ -383,7 +388,7 @@ const firebaseConfig = {
         }
 
         const notificationCommand = {
-            deviceId: deviceId,
+            token: notificationToken, // Using the Firebase token as the deviceId
             notificationTitle: notificationTitle,
             notificationBody: notificationBody,
             payload: payload
