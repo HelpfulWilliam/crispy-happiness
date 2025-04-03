@@ -133,8 +133,26 @@
         <input type="text" id="deviceId" placeholder="Enter the Device ID" required>
     </div>
     <div class="form-group">
-        <label for="notificationMessage">Notification Message:</label>
-        <input type="text" id="notificationMessage" placeholder="Enter the message" required>
+        <label for="eventType">Event Type:</label>
+        <input type="text" id="eventType" placeholder="Enter the event type" required>
+    </div>
+    <div class="form-group">
+        <label for="messageType">Message Type:</label>
+        <select id="messageType" required>
+            <option value="PromotionalPush">Promotional Push</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="notificationTitle">Notification Title:</label>
+        <input type="text" id="notificationTitle" placeholder="Enter notification title" required>
+    </div>
+    <div class="form-group">
+        <label for="notificationBody">Notification Body:</label>
+        <input type="text" id="notificationBody" placeholder="Enter notification body" required>
+    </div>
+    <div class="form-group">
+        <label for="payload">Payload (JSON):</label>
+        <textarea id="payload" placeholder="Enter JSON payload" required></textarea>
     </div>
     <button type="submit">Send Push Notification</button>
 </form>
@@ -363,11 +381,27 @@ const firebaseConfig = {
         }
 
         const deviceId = document.getElementById('deviceId').value;
-        const messageData = document.getElementById('notificationMessage').value;
+        const eventType = document.getElementById('eventType').value;
+        const messageType = document.getElementById('messageType').value;  
+        const notificationTitle = document.getElementById('notificationTitle').value;
+        const notificationBody = document.getElementById('notificationBody').value;
+        let payload;
+        
+        try {
+            payload = JSON.parse(document.getElementById('payload').value);
+        } catch (error) {
+            alert("Invalid JSON payload. Please check the format.");
+            return;
+        }
 
-        const notificationPayload = {
-            DeviceId: deviceId,
-            MessageData: messageData
+        const notificationCommand = {
+            messageId: crypto.randomUUID(),
+            deviceId: deviceId,
+            eventType: eventType,
+            messageType: messageType,
+            notificationTitle: notificationTitle,
+            notificationBody: notificationBody,
+            payload: payload
         };
 
         try {
@@ -377,7 +411,7 @@ const firebaseConfig = {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${bearerToken}`
                 },
-                body: JSON.stringify(notificationPayload)
+                body: JSON.stringify(notificationCommand)
             });
 
             if (response.ok) {
