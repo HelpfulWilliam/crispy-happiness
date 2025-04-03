@@ -133,16 +133,6 @@
         <input type="text" id="deviceId" placeholder="Enter the Device ID" required>
     </div>
     <div class="form-group">
-        <label for="eventType">Event Type:</label>
-        <input type="text" id="eventType" placeholder="Enter the event type" required>
-    </div>
-    <div class="form-group">
-        <label for="messageType">Message Type:</label>
-        <select id="messageType" required>
-            <option value="PromotionalPush">Promotional Push</option>
-        </select>
-    </div>
-    <div class="form-group">
         <label for="notificationTitle">Notification Title:</label>
         <input type="text" id="notificationTitle" placeholder="Enter notification title" required>
     </div>
@@ -381,8 +371,6 @@ const firebaseConfig = {
         }
 
         const deviceId = document.getElementById('deviceId').value;
-        const eventType = document.getElementById('eventType').value;
-        const messageType = document.getElementById('messageType').value;  
         const notificationTitle = document.getElementById('notificationTitle').value;
         const notificationBody = document.getElementById('notificationBody').value;
         let payload;
@@ -395,10 +383,7 @@ const firebaseConfig = {
         }
 
         const notificationCommand = {
-            messageId: crypto.randomUUID(),
             deviceId: deviceId,
-            eventType: eventType,
-            messageType: messageType,
             notificationTitle: notificationTitle,
             notificationBody: notificationBody,
             payload: payload
