@@ -7,14 +7,14 @@ importScripts('https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging-com
 // your app's Firebase config object.
 // https://firebase.google.com/docs/web/setup#config-object
 firebase.initializeApp({
-      apiKey: "AIzaSyBXIfEFmRH9eCUqUZEba14Lou79ZpWsKRI",
-    authDomain: "notifications-test-c2f35.firebaseapp.com",
-    projectId: "notifications-test-c2f35",
-    storageBucket: "notifications-test-c2f35.firebasestorage.app",
-    messagingSenderId: "656684992609",
-    appId: "1:656684992609:web:bf196050a552b7170ec220",
-    measurementId: "G-81JS422NJG"
-}); 
+  apiKey: "AIzaSyAp5ar55zWlqiXVqXXfG0jKPBDvrnEP-ng",
+  authDomain: "unu-health-stg.firebaseapp.com",
+  projectId: "unu-health-stg",
+  storageBucket: "unu-health-stg.firebasestorage.app",
+  messagingSenderId: "250310309706",
+  appId: "1:250310309706:web:203ede8ca60a7a488a73b3",
+  measurementId: "G-SXR9J0T1J7"
+});
 
 // Retrieve an instance of Firebase Messaging so that it can handle background
 // messages.
